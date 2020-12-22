@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!--  Custom Colors  -->
+    <color name="green">#238823</color>
+    <color name="yellow">#ffbf00</color>
+    <color name="red">#d2222d</color>
+
+    <color name="deleteBackground">#ff6666</color>
+    <color name="editBackground">#66e0ff</color>
+
+    <color name="background">#e5e5e5</color>
+    <color name="itemBackground">#ffffff</color>
+    <color name="bottomBackground">#ffffff</color>
+    <color name="bottomSheetBackground">#ffffff</color>
+
+    <color name="toolBarBackground">@color/purple_500</color>
+    <color name="toolBarText">@color/black</color>
+
+    <color name="buttonBackground">@color/purple_500</color>
+    <!--    -->
+    <!--    background    -->
+<!--    <item name="backgroundColor">@color/teal_200</item>-->
+    <!--    surface    -->
+
+<!--    <item name="surfaceColor">@color/teal_200</item>-->
+    <!--    primary    -->
+    <!--    secondary    -->
+
+    <!--    on background    -->
+    <!--    on surface    -->
+    <!--    on primary    -->
+    <!--    on secondary    -->
+</resources>

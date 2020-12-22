@@ -1,0 +1,42 @@
+<resources>
+    <!--  App Strings  -->
+    <string name="app_name">Best To-Do List</string>
+    <string name="action_bar_groups">To-Do Lists</string>
+    <string name="name">Name:</string>
+    <string name="description">Description:</string>
+    <string name="priority">Priority:</string>
+    <string name="save">Save</string>
+    <string name="empty_title">Nothing to see here!</string>
+
+    <!--  Group Strings  -->
+    <string name="create_group">Create new to-do list</string>
+    <string name="edit_group">Edit to-do list</string>
+    <string name="delete_group_title">Delete To-Do List</string>
+    <string name="delete_group_message">Are you sure you want to delete \"%s\"? This will also delete any tasks in the list.</string>
+    <string name="empty_group_message">Add a to-do list below to get started.</string>
+    <string name="group_alert_title">Unable to save to-do list</string>
+
+    <!--  Task Strings  -->
+    <string name="create_task">Create new task</string>
+    <string name="edit_task">Edit task</string>
+    <string name="delete_task_title">Delete Task</string>
+    <string name="delete_task_message">Are you sure you want to delete \"%s\"?</string>
+    <string name="empty_task_message">Add a task below to get started.</string>
+    <string name="task_complete_title">Complete Task</string>
+    <string name="task_complete_message">Are you ready to complete \"%s\"?</string>
+    <string name="task_reset_title">Reset Task</string>
+    <string name="task_reset_message">Are you sure you want to reset \"%s\"?</string>
+    <string name="task_alert_title">Unable to save task</string>
+
+    <!--  Misc Strings  -->
+    <string name="alert_error_title">An error occurred</string>
+    <string name="alert_error_message">Please try again.</string>
+    <string name="fields_alert_message">Please make sure all of the fields are filled out.</string>
+
+    <!--  String Arrays  -->
+    <string-array name="priority_options">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
+</resources>

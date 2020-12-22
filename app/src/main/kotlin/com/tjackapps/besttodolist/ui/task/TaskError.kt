@@ -1,0 +1,10 @@
+package com.tjackapps.besttodolist.ui.task
+
+object TaskError {
+    const val TASK_LOAD_FAILURE = "TASK_LOAD_FAILURE"
+    const val TASK_ADD_FAILURE = "TASK_ADD_FAILURE"
+    const val TASK_UPDATE_FAILURE = "TASK_UPDATE_FAILURE"
+    const val TASK_COMPLETE_FAILURE = "TASK_UPDATE_FAILURE"
+    const val TASK_DELETE_FAILURE = "TASK_DELETE_FAILURE"
+    const val TASK_COMPLETED_STATE_FAILURE = "TASK_COMPLETED_STATE_FAILURE"
+}
