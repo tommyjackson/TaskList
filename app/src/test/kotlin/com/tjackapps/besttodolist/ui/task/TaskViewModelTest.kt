@@ -23,7 +23,27 @@ class TaskViewModelTest {
 
     @Test
     fun `verify content state gets emitted after tasks are loaded`() {
-        val contentState = TaskPageState.Content(emptyList())
+        val contentState = TaskPageState.Content(listOf(mockTask))
+
+        given {
+            databaseManager.getTasksForGroup(any())
+        } willReturn {
+            Single.just(listOf(mockTask))
+        }
+
+        taskViewModel.getTasksForGroup(0)
+        taskViewModel.fragmentState()
+            .test()
+            .assertNoErrors()
+            .assertNotComplete()
+            .assertValue {
+                it == contentState
+            }
+    }
+
+    @Test
+    fun `verify empty state gets emitted for no tasks`() {
+        val contentState = TaskPageState.Empty
 
         given {
             databaseManager.getTasksForGroup(any())
@@ -43,7 +63,7 @@ class TaskViewModelTest {
 
     @Test
     fun `verify content state gets emitted after task is deleted`() {
-        val contentState = TaskPageState.Content(emptyList())
+        val contentState = TaskPageState.Content(listOf(mockTask))
 
         given {
             databaseManager.deleteTask(any())
@@ -60,7 +80,7 @@ class TaskViewModelTest {
         given {
             databaseManager.getTasksForGroup(any())
         } willReturn {
-            Single.just(emptyList())
+            Single.just(listOf(mockTask))
         }
 
         taskViewModel.deleteTask(mockTask)
@@ -75,7 +95,7 @@ class TaskViewModelTest {
 
     @Test
     fun `verify content state gets emitted after task is completed`() {
-        val contentState = TaskPageState.Content(emptyList())
+        val contentState = TaskPageState.Content(listOf(mockTask))
 
         given {
             databaseManager.completeTask(any(), any())
@@ -86,7 +106,7 @@ class TaskViewModelTest {
         given {
             databaseManager.getTasksForGroup(any())
         } willReturn {
-            Single.just(emptyList())
+            Single.just(listOf(mockTask))
         }
 
         taskViewModel.completeTask(0, true)

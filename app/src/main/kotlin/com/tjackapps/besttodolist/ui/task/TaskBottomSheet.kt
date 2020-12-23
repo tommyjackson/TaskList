@@ -1,12 +1,19 @@
 package com.tjackapps.besttodolist.ui.task
 
 import android.app.AlertDialog
+import android.app.Dialog
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.FrameLayout
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tjackapps.besttodolist.R
 import com.tjackapps.besttodolist.helper.extensions.getViewModel
@@ -75,6 +82,22 @@ class TaskBottomSheet : BottomSheetDialogFragment(), AdapterView.OnItemSelectedL
                 it.getInt(KEY_GROUP_ID)
             }
         }
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        dialog.setOnShowListener {
+            Handler().post {
+                val bottomSheet = (dialog as? BottomSheetDialog)?.findViewById<View>(R.id.design_bottom_sheet) as? FrameLayout
+                bottomSheet?.let {
+                    BottomSheetBehavior.from(it).state = STATE_EXPANDED
+                }
+            }
+        }
+
+        return dialog
     }
 
     override fun onCreateView(

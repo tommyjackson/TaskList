@@ -22,7 +22,27 @@ class GroupViewModelTest {
 
     @Test
     fun `verify content state gets emitted after groups are loaded`() {
-        val contentState = GroupPageState.Content(emptyList())
+        val contentState = GroupPageState.Content(listOf(mockGroup))
+
+        given {
+            databaseManager.getGroups()
+        } willReturn {
+            Single.just(listOf(mockGroup))
+        }
+
+        groupViewModel.getGroups()
+        groupViewModel.fragmentState()
+            .test()
+            .assertNoErrors()
+            .assertNotComplete()
+            .assertValue {
+                it == contentState
+            }
+    }
+
+    @Test
+    fun `verify empty state gets emitted for no groups`() {
+        val contentState = GroupPageState.Empty
 
         given {
             databaseManager.getGroups()
@@ -42,7 +62,7 @@ class GroupViewModelTest {
 
     @Test
     fun `verify content state gets emitted after group is deleted`() {
-        val contentState = GroupPageState.Content(emptyList())
+        val contentState = GroupPageState.Content(listOf(mockGroup))
 
         given {
             databaseManager.deleteTasksFromGroup(any())
@@ -59,7 +79,7 @@ class GroupViewModelTest {
         given {
             databaseManager.getGroups()
         } willReturn {
-            Single.just(emptyList())
+            Single.just(listOf(mockGroup))
         }
 
         groupViewModel.deleteGroup(mockGroup)
