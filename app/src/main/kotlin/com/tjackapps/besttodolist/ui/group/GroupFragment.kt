@@ -12,14 +12,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tjackapps.besttodolist.R
 import com.tjackapps.besttodolist.databinding.GroupFragmentBinding
-import com.tjackapps.besttodolist.ui.misc.*
+import com.tjackapps.besttodolist.helper.extensions.*
+import com.tjackapps.besttodolist.helper.swipecallback.SwipeToLeftCallback
+import com.tjackapps.besttodolist.helper.swipecallback.SwipeToRightCallback
 import com.tjackapps.besttodolist.ui.task.TaskFragment
 import com.tjackapps.data.model.Group
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import joetr.com.swipereveal.SwipeToLeftCallback
-import joetr.com.swipereveal.SwipeToRightCallback
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -87,13 +87,13 @@ class GroupFragment : Fragment(), GroupItemCallback, GroupBottomSheet.GroupSheet
             }
             is GroupPageState.Content -> {
                 setupList(pageState.groups)
-                if (pageState.groups.isEmpty()) {
-                    binding.empty.isVisible = true
-                    binding.groupList.isVisible = false
-                } else {
-                    binding.groupList.isVisible = true
-                    binding.empty.isVisible = false
-                }
+                binding.groupList.isVisible = true
+                binding.empty.isVisible = false
+                binding.layout.displayedChild(binding.content)
+            }
+            is GroupPageState.Empty -> {
+                binding.empty.isVisible = true
+                binding.groupList.isVisible = false
                 binding.layout.displayedChild(binding.content)
             }
             is GroupPageState.Error -> {
@@ -111,6 +111,7 @@ class GroupFragment : Fragment(), GroupItemCallback, GroupBottomSheet.GroupSheet
         binding.groupList.layoutManager = LinearLayoutManager(requireContext())
         binding.groupList.adapter = groupAdapter
 
+        // callback for when an item is swiped to the left
         val swipeToLeftCallback = object : SwipeToLeftCallback(requireContext(), R.drawable.ic_delete, R.color.deleteBackground) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 onDeleteClicked(viewHolder.adapterPosition)
@@ -119,6 +120,7 @@ class GroupFragment : Fragment(), GroupItemCallback, GroupBottomSheet.GroupSheet
         val swipeToLeftItemTouchHelper = ItemTouchHelper(swipeToLeftCallback)
         swipeToLeftItemTouchHelper.attachToRecyclerView(binding.groupList)
 
+        // callback for when an item is swiped to the right
         val swipeToRightCallback = object : SwipeToRightCallback(requireContext(), R.drawable.ic_edit, R.color.editBackground) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 onEditClicked(viewHolder.adapterPosition)
@@ -134,6 +136,7 @@ class GroupFragment : Fragment(), GroupItemCallback, GroupBottomSheet.GroupSheet
         transaction.addToBackStack(TaskFragment::class.simpleName)
         transaction.commit()
     }
+
     fun onEditClicked(index: Int) {
         groupAdapter.notifyItemChanged(index)
         GroupBottomSheet.newInstanceForEdit(viewModel.getGroupFromIndex(index)).apply {
@@ -145,10 +148,10 @@ class GroupFragment : Fragment(), GroupItemCallback, GroupBottomSheet.GroupSheet
         AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.delete_group_title))
                 .setMessage(getString(R.string.delete_group_message, viewModel.getGroupFromIndex(index).name))
-                .setPositiveButton("OK") { _, _ ->
+                .setPositiveButton(getString(R.string.ok)) { _, _ ->
                     viewModel.deleteGroup(viewModel.getGroupFromIndex(index))
                 }
-                .setNegativeButton("CANCEL") { _, _ ->
+                .setNegativeButton(getString(R.string.cancel)) { _, _ ->
                     groupAdapter.notifyItemChanged(index)
                 }
                 .setOnCancelListener {

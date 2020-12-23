@@ -9,8 +9,8 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tjackapps.besttodolist.R
-import com.tjackapps.besttodolist.ui.misc.getViewModel
-import com.tjackapps.besttodolist.ui.misc.plusAssign
+import com.tjackapps.besttodolist.helper.extensions.getViewModel
+import com.tjackapps.besttodolist.helper.extensions.plusAssign
 import com.tjackapps.data.model.Priority
 import com.tjackapps.data.model.Task
 import com.tjackapps.besttodolist.databinding.TaskSheetBinding
@@ -36,8 +36,6 @@ class TaskBottomSheet : BottomSheetDialogFragment(), AdapterView.OnItemSelectedL
 
     private var groupId: Int = -1
 
-    private var isEditSheet = false
-
     private var taskToEdit: Task? = null
 
     private var compositeDisposable = CompositeDisposable()
@@ -46,7 +44,6 @@ class TaskBottomSheet : BottomSheetDialogFragment(), AdapterView.OnItemSelectedL
 
     companion object {
         private const val KEY_GROUP_ID = "group_id"
-        private const val KEY_IS_EDIT_SHEET = "is_edit_sheet"
         private const val KEY_TASK_TO_EDIT = "task_to_edit"
 
         fun newInstance(groupId: Int = -1): TaskBottomSheet {
@@ -60,7 +57,6 @@ class TaskBottomSheet : BottomSheetDialogFragment(), AdapterView.OnItemSelectedL
         fun newInstanceForEdit(task: Task): TaskBottomSheet {
             return TaskBottomSheet().apply {
                 arguments = Bundle().apply {
-                    putBoolean(KEY_IS_EDIT_SHEET, true)
                     putParcelable(KEY_TASK_TO_EDIT, task)
                 }
             }
@@ -71,13 +67,12 @@ class TaskBottomSheet : BottomSheetDialogFragment(), AdapterView.OnItemSelectedL
         super.onCreate(savedInstanceState)
         viewModel = requireActivity().getViewModel(viewModelProvider)
         arguments?.let {
-            isEditSheet = it.getBoolean(KEY_IS_EDIT_SHEET)
+            taskToEdit = it.getParcelable(KEY_TASK_TO_EDIT)
 
-            if (isEditSheet) {
-                groupId = -2
-                taskToEdit = it.getParcelable(KEY_TASK_TO_EDIT)
+            groupId = if (taskToEdit != null) {
+                -2
             } else {
-                groupId = it.getInt(KEY_GROUP_ID)
+                it.getInt(KEY_GROUP_ID)
             }
         }
     }
@@ -112,7 +107,7 @@ class TaskBottomSheet : BottomSheetDialogFragment(), AdapterView.OnItemSelectedL
                 prioritySelector.adapter = adapter
             }
 
-            if (isEditSheet && taskToEdit != null) {
+            if (taskToEdit != null) {
                 title.text = getString(R.string.edit_task)
                 nameEntry.setText(taskToEdit?.name)
                 descriptionEntry.setText(taskToEdit?.description)
@@ -134,6 +129,12 @@ class TaskBottomSheet : BottomSheetDialogFragment(), AdapterView.OnItemSelectedL
     private fun subscribeToViewModel() {
         compositeDisposable += viewModel.sheetAction()
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnError {
+                showErrorDialog(
+                    getString(R.string.task_alert_title),
+                    getString(R.string.alert_error_message)
+                )
+            }
             .subscribe {
                 handle(it)
             }
@@ -146,6 +147,11 @@ class TaskBottomSheet : BottomSheetDialogFragment(), AdapterView.OnItemSelectedL
                     val callback = targetFragment as? TaskSheetCallback
                     callback?.onTaskSaved()
                     dismiss()
+                } else {
+                    showErrorDialog(
+                        getString(R.string.alert_error_title),
+                        getString(R.string.alert_error_message)
+                    )
                 }
             }
             is TaskSheetAction.SaveTaskFailure -> {
@@ -164,7 +170,7 @@ class TaskBottomSheet : BottomSheetDialogFragment(), AdapterView.OnItemSelectedL
 
             if (name.isNotBlank() && description.isNotBlank() && groupId != -1) {
 
-                if (isEditSheet) {
+                if (taskToEdit != null) {
                     val editTask = Task(
                         taskId = taskToEdit?.taskId ?: 0,
                         groupId = taskToEdit?.groupId ?: groupId,
@@ -199,7 +205,7 @@ class TaskBottomSheet : BottomSheetDialogFragment(), AdapterView.OnItemSelectedL
         AlertDialog.Builder(requireContext())
             .setTitle(title)
             .setMessage(message)
-            .setNeutralButton("OK", null)
+            .setNeutralButton(getString(R.string.ok), null)
             .create()
             .show()
     }
@@ -209,7 +215,7 @@ class TaskBottomSheet : BottomSheetDialogFragment(), AdapterView.OnItemSelectedL
     }
 
     override fun onNothingSelected(p0: AdapterView<*>?) {
-        TODO("Not yet implemented")
+        // noop
     }
 
     override fun onDestroy() {

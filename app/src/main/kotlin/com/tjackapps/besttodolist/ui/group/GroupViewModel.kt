@@ -1,7 +1,7 @@
 package com.tjackapps.besttodolist.ui.group
 
 import androidx.lifecycle.ViewModel
-import com.tjackapps.besttodolist.ui.misc.plusAssign
+import com.tjackapps.besttodolist.helper.extensions.plusAssign
 import com.tjackapps.data.manager.DatabaseManager
 import com.tjackapps.data.model.Group
 import io.reactivex.Observable
@@ -27,21 +27,30 @@ class GroupViewModel @Inject constructor(
 
     private var groups = emptyList<Group>()
 
+    /**
+     * Loads all of the groups in the database
+     */
     fun getGroups() {
         showLoading()
-        groups = emptyList()
 
         compositeDisposable += loadGroups()
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     groups = it
-                    fragmentState.onNext(GroupPageState.Content(it))
+                    if (groups.isEmpty()) {
+                        fragmentState.onNext(GroupPageState.Empty)
+                    } else {
+                        fragmentState.onNext(GroupPageState.Content(it))
+                    }
                 }, {
                     Timber.e(GroupError.GROUP_LOAD_FAILURE)
                     fragmentState.onNext(GroupPageState.Error)
                 })
     }
 
+    /**
+     * Adds a group to the database
+     */
     fun addGroup(group: Group) {
 
         compositeDisposable += databaseManager
@@ -55,6 +64,9 @@ class GroupViewModel @Inject constructor(
                 })
     }
 
+    /**
+     * Updates a group in the database
+     */
     fun updateGroup(group: Group) {
 
         compositeDisposable += databaseManager
@@ -68,6 +80,9 @@ class GroupViewModel @Inject constructor(
                 })
     }
 
+    /**
+     * Deletes a group in the database and all of its associated tasks
+     */
     fun deleteGroup(group: Group) {
         showLoading()
 
@@ -81,7 +96,12 @@ class GroupViewModel @Inject constructor(
                     loadGroups()
                 }
                 .subscribe({
-                    fragmentState.onNext(GroupPageState.Content(it))
+                    groups = it
+                    if (groups.isEmpty()) {
+                        fragmentState.onNext(GroupPageState.Empty)
+                    } else {
+                        fragmentState.onNext(GroupPageState.Content(it))
+                    }
                 }, {
                     Timber.e(GroupError.GROUP_DELETE_FAILURE)
                     fragmentState.onNext(GroupPageState.Error)

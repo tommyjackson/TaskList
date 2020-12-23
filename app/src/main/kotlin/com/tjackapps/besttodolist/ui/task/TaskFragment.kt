@@ -11,16 +11,16 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tjackapps.besttodolist.R
-import com.tjackapps.besttodolist.ui.misc.displayedChild
-import com.tjackapps.besttodolist.ui.misc.getViewModel
-import com.tjackapps.besttodolist.ui.misc.plusAssign
 import com.tjackapps.besttodolist.databinding.TaskFragmentBinding
+import com.tjackapps.besttodolist.helper.extensions.displayedChild
+import com.tjackapps.besttodolist.helper.extensions.getViewModel
+import com.tjackapps.besttodolist.helper.extensions.plusAssign
+import com.tjackapps.besttodolist.helper.swipecallback.SwipeToLeftCallback
+import com.tjackapps.besttodolist.helper.swipecallback.SwipeToRightCallback
 import com.tjackapps.data.model.Task
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import joetr.com.swipereveal.SwipeToLeftCallback
-import joetr.com.swipereveal.SwipeToRightCallback
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -111,17 +111,16 @@ class TaskFragment : Fragment(), TaskBottomSheet.TaskSheetCallback, TaskItemCall
             }
             is TaskPageState.Content -> {
                 setupList(pageState.tasks)
-                if (pageState.tasks.isEmpty()) {
-                    binding.empty.isVisible = true
-                    binding.taskList.isVisible = false
-                } else {
-                    binding.taskList.isVisible = true
-                    binding.empty.isVisible = false
-                }
+                binding.taskList.isVisible = true
+                binding.empty.isVisible = false
+                binding.layout.displayedChild(binding.content)
+            }
+            is TaskPageState.Empty -> {
+                binding.empty.isVisible = true
+                binding.taskList.isVisible = false
                 binding.layout.displayedChild(binding.content)
             }
             is TaskPageState.Error -> {
-                // TODO log with timber here
                 binding.layout.displayedChild(binding.error)
             }
         }
@@ -136,6 +135,7 @@ class TaskFragment : Fragment(), TaskBottomSheet.TaskSheetCallback, TaskItemCall
         binding.taskList.layoutManager = LinearLayoutManager(requireContext())
         binding.taskList.adapter = taskAdapter
 
+        // callback for when an item is swiped to the left
         val swipeToLeftCallback = object : SwipeToLeftCallback(requireContext(), R.drawable.ic_delete, R.color.deleteBackground) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 onDeleteClicked(viewHolder.adapterPosition)
@@ -144,6 +144,7 @@ class TaskFragment : Fragment(), TaskBottomSheet.TaskSheetCallback, TaskItemCall
         val swipeToLeftItemTouchHelper = ItemTouchHelper(swipeToLeftCallback)
         swipeToLeftItemTouchHelper.attachToRecyclerView(binding.taskList)
 
+        // callback for when an item is swiped to the right
         val swipeToRightCallback = object : SwipeToRightCallback(requireContext(), R.drawable.ic_edit, R.color.editBackground) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 onEditClicked(viewHolder.adapterPosition)
@@ -164,10 +165,10 @@ class TaskFragment : Fragment(), TaskBottomSheet.TaskSheetCallback, TaskItemCall
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.delete_task_title))
             .setMessage(getString(R.string.delete_task_message, viewModel.getTaskFromIndex(index).name))
-            .setPositiveButton("OK") { _, _ ->
+            .setPositiveButton(getString(R.string.ok)) { _, _ ->
                 viewModel.deleteTask(viewModel.getTaskFromIndex(index))
             }
-            .setNegativeButton("CANCEL") { _, _ ->
+            .setNegativeButton(getString(R.string.cancel)) { _, _ ->
                 taskAdapter.notifyItemChanged(index)
             }
             .setOnCancelListener {

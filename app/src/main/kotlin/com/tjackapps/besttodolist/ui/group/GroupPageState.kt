@@ -9,5 +9,7 @@ sealed class GroupPageState {
         val groups: List<Group>
     ) : GroupPageState()
 
+    object Empty : GroupPageState()
+
     object Error : GroupPageState()
 }

@@ -2,8 +2,8 @@
     <!--  App Strings  -->
     <string name="app_name">Best To-Do List</string>
     <string name="action_bar_groups">To-Do Lists</string>
-    <string name="name">Name:</string>
-    <string name="description">Description:</string>
+    <string name="name">Name</string>
+    <string name="description">Description</string>
     <string name="priority">Priority:</string>
     <string name="save">Save</string>
     <string name="empty_title">Nothing to see here!</string>
@@ -29,6 +29,8 @@
     <string name="task_alert_title">Unable to save task</string>
 
     <!--  Misc Strings  -->
+    <string name="ok">OK</string>
+    <string name="cancel">CANCEL</string>
     <string name="alert_error_title">An error occurred</string>
     <string name="alert_error_message">Please try again.</string>
     <string name="fields_alert_message">Please make sure all of the fields are filled out.</string>

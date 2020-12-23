@@ -9,5 +9,7 @@ sealed class TaskPageState {
         val tasks: List<Task>
     ) : TaskPageState()
 
+    object Empty : TaskPageState()
+
     object Error : TaskPageState()
 }

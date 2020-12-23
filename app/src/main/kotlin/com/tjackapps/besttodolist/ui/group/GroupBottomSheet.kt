@@ -7,14 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tjackapps.besttodolist.R
-import com.tjackapps.besttodolist.ui.misc.getViewModel
-import com.tjackapps.besttodolist.ui.misc.plusAssign
+import com.tjackapps.besttodolist.helper.extensions.getViewModel
+import com.tjackapps.besttodolist.helper.extensions.plusAssign
 import com.tjackapps.data.model.Group
 import com.tjackapps.besttodolist.databinding.GroupSheetBinding
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -34,8 +33,6 @@ class GroupBottomSheet : BottomSheetDialogFragment() {
 
     private var compositeDisposable = CompositeDisposable()
 
-    private var isEditSheet = false
-
     private var groupToEdit: Group? = null
 
     companion object {
@@ -47,7 +44,6 @@ class GroupBottomSheet : BottomSheetDialogFragment() {
         fun newInstanceForEdit(group: Group): GroupBottomSheet {
             return GroupBottomSheet().apply {
                 arguments = Bundle().apply {
-                    putBoolean(KEY_IS_EDIT_SHEET, true)
                     putParcelable(KEY_GROUP_TO_EDIT, group)
                 }
             }
@@ -59,7 +55,6 @@ class GroupBottomSheet : BottomSheetDialogFragment() {
         viewModel = requireActivity().getViewModel(viewModelProvider)
 
         arguments?.let {
-            isEditSheet = it.getBoolean(KEY_IS_EDIT_SHEET)
             groupToEdit = it.getParcelable(KEY_GROUP_TO_EDIT)
         }
     }
@@ -76,7 +71,7 @@ class GroupBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (isEditSheet && groupToEdit != null) {
+        if (groupToEdit != null) {
             setupEditSheet()
         }
 
@@ -97,6 +92,12 @@ class GroupBottomSheet : BottomSheetDialogFragment() {
     private fun subscribeToViewModel() {
         compositeDisposable += viewModel.sheetAction()
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnError {
+                showErrorDialog(
+                    getString(R.string.group_alert_title),
+                    getString(R.string.alert_error_message)
+                )
+            }
             .subscribe {
                 handle(it)
             }
@@ -109,6 +110,11 @@ class GroupBottomSheet : BottomSheetDialogFragment() {
                     val callback = targetFragment as? GroupSheetCallback
                     callback?.onGroupSaved()
                     dismiss()
+                } else {
+                    showErrorDialog(
+                        getString(R.string.alert_error_title),
+                        getString(R.string.alert_error_message)
+                    )
                 }
             }
             is GroupSheetAction.SaveGroupFailure -> {
@@ -127,7 +133,7 @@ class GroupBottomSheet : BottomSheetDialogFragment() {
 
             if (name.isNotBlank() && description.isNotBlank()) {
 
-                if (isEditSheet) {
+                if (groupToEdit != null) {
                     val editGroup = Group(
                         groupId = groupToEdit?.groupId ?: 0,
                         name = name,
@@ -162,7 +168,7 @@ class GroupBottomSheet : BottomSheetDialogFragment() {
         AlertDialog.Builder(requireContext())
             .setTitle(title)
             .setMessage(message)
-            .setNeutralButton("OK", null)
+            .setNeutralButton(getString(R.string.ok), null)
             .create()
             .show()
     }

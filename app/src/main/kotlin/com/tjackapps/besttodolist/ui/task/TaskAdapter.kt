@@ -7,7 +7,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.tjackapps.besttodolist.R
-import com.tjackapps.besttodolist.ui.misc.getLayoutInflater
+import com.tjackapps.besttodolist.helper.extensions.getLayoutInflater
 import com.tjackapps.besttodolist.databinding.TaskItemBinding
 import com.tjackapps.data.model.Priority
 import com.tjackapps.data.model.Task

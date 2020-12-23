@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.tjackapps.besttodolist.ui.misc.getLayoutInflater
+import com.tjackapps.besttodolist.helper.extensions.getLayoutInflater
 import com.tjackapps.data.model.Group
 import com.tjackapps.besttodolist.databinding.GroupItemBinding
 

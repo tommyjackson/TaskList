@@ -1,7 +1,8 @@
 package com.tjackapps.besttodolist.ui.task
 
 import androidx.lifecycle.ViewModel
-import com.tjackapps.besttodolist.ui.misc.plusAssign
+import com.tjackapps.besttodolist.helper.extensions.plusAssign
+import com.tjackapps.besttodolist.ui.group.GroupPageState
 import com.tjackapps.data.manager.DatabaseManager
 import com.tjackapps.data.model.Task
 import io.reactivex.Observable
@@ -29,6 +30,9 @@ class TaskViewModel @Inject constructor(
 
     var groupId = -1
 
+    /**
+     * Loads all of the tasks in the database
+     */
     fun getTasksForGroup(groupId: Int) {
         showLoading()
         this.groupId = groupId
@@ -37,13 +41,20 @@ class TaskViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .subscribe({
                 tasks = it
-                fragmentState.onNext(TaskPageState.Content(it))
+                if (tasks.isEmpty()) {
+                    fragmentState.onNext(TaskPageState.Empty)
+                } else {
+                    fragmentState.onNext(TaskPageState.Content(it))
+                }
             }, {
                 Timber.e(TaskError.TASK_LOAD_FAILURE)
                 fragmentState.onNext(TaskPageState.Error)
             })
     }
 
+    /**
+     * Adds a task to the database
+     */
     fun addTask(task: Task) {
 
         compositeDisposable += databaseManager
@@ -57,6 +68,9 @@ class TaskViewModel @Inject constructor(
             })
     }
 
+    /**
+     * Updates a task in the database
+     */
     fun updateTask(task: Task) {
 
         compositeDisposable += databaseManager
@@ -70,6 +84,9 @@ class TaskViewModel @Inject constructor(
             })
     }
 
+    /**
+     * Sets the completed state for a task in the database
+     */
     fun completeTask(taskId: Int, completed: Boolean) {
         showLoading()
 
@@ -81,13 +98,20 @@ class TaskViewModel @Inject constructor(
             }
             .subscribe({
                 tasks = it
-                fragmentState.onNext(TaskPageState.Content(it))
+                if (tasks.isEmpty()) {
+                    fragmentState.onNext(TaskPageState.Empty)
+                } else {
+                    fragmentState.onNext(TaskPageState.Content(it))
+                }
             }, {
                 Timber.e(TaskError.TASK_COMPLETE_FAILURE)
                 fragmentState.onNext(TaskPageState.Error)
             })
     }
 
+    /**
+     * Deletes a task from the database
+     */
     fun deleteTask(task: Task) {
         showLoading()
 
@@ -99,7 +123,11 @@ class TaskViewModel @Inject constructor(
             }
             .subscribe({
                 tasks = it
-                fragmentState.onNext(TaskPageState.Content(it))
+                if (tasks.isEmpty()) {
+                    fragmentState.onNext(TaskPageState.Empty)
+                } else {
+                    fragmentState.onNext(TaskPageState.Content(it))
+                }
             }, {
                 Timber.e(TaskError.TASK_DELETE_FAILURE)
                 fragmentState.onNext(TaskPageState.Error)
